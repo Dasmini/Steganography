@@ -1,0 +1,15 @@
+# Executable
+a.out
+
+# BMP files
+
+# Text files
+
+# Object files
+*.o
+
+# VS Code settings
+.vscode/
+
+# Temporary files
+*.swp
