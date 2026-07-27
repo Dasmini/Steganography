@@ -113,7 +113,7 @@ Status read_and_validate_encode_args(char **argv, EncodeInfo *encInfo)
     }
     else
     {
-        printf("Output filenmae not given, So creating one named stego.bmp\n");
+        printf("Output filename not given, So creating one named stego.bmp\n");
         encInfo -> stego_image_fname = "stego.bmp";
     }
     return e_success;
@@ -165,11 +165,11 @@ Status do_encoding(EncodeInfo *encInfo)
     strcpy(encInfo -> extn_secret_file, strchr(encInfo -> secret_fname, '.'));
     if(encode_extension_size(4, encInfo) == e_success)
     {
-        printf("File size encoded successfully\n");
+        printf("File extension size encoded successfully\n");
     }
     else
     {
-        printf("Failed to encode file size\n");
+        printf("Failed to encode file extension size\n");
         return e_failure;
     }
 
@@ -185,9 +185,11 @@ Status do_encoding(EncodeInfo *encInfo)
     }
 
     // Encode secret file size
-    if(encode_secret_file_size(encInfo -> image_capacity, encInfo) == e_success)
+    if(encode_secret_file_size(encInfo -> size_secret_file, encInfo) == e_success)
     {
         printf("File size encoded successfully\n");
+        //printf("Image capacity : %d\n", encInfo -> image_capacity);
+        //printf("Secret file size : %ld\n", encInfo -> size_secret_file);
     }
     else
     {
@@ -277,7 +279,7 @@ Status encode_integer_to_lsb(int size, EncodeInfo *encInfo)
 {
     char str[32];
     fread(str, 32, 1, encInfo -> fptr_src_image);
-    for (int i = 0 ; i < 31; i++)
+    for (int i = 0 ; i < 32; i++)
     {
         str[i] = (str[i] & 0xFE) | ((size >> (31 - i)) & 1);
     }

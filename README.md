@@ -242,8 +242,6 @@ Through this project, I gained hands-on experience with:
 
 **Dasmini D**
 
-Hey check these out!
-- [GitHub](https://github.com/Dasmini)
-- [LinkedIn](https://www.linkedin.com/in/dasmini-d-265b3920b/)
+Hey check out [my GitHub](https://github.com/Dasmini) and [my LinkedIn](https://www.linkedin.com/in/dasmini-d-265b3920b/)
 
 ---
