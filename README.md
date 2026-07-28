@@ -28,6 +28,7 @@ This project encodes a text file into a BMP image by modifying the Least Signifi
 
 - C Programming
 - GCC
+- Git
 
 ---
 
@@ -37,13 +38,14 @@ This project encodes a text file into a BMP image by modifying the Least Signifi
 .
 ├── encode.c
 ├── encode.h
-├── decode.c _not yet created_
-├── decode.h _not yet created_
+├── decode.c 
+├── decode.h 
 ├── common.h
 ├── types.h
 ├── test_encode.c
 ├── README.md
 ├── secret.txt
+├── output.txt
 ├── stego.bmp
 └── beautiful.bmp
 ```
@@ -136,6 +138,15 @@ stego.bmp
 ```bash
 ./a.out -d stego.bmp output.txt
 ```
+If the output file name is omitted:
+```bash
+./a.out -d stego.bmp
+```
+The program automatically creates:
+
+```
+output.txt
+```
 
 ---
 
@@ -220,7 +231,11 @@ Create Output File
 
 ## 📸 Sample
 
-_yet to be added_
+### Encoding output
+(/Screenshots/Encode%20output.png)
+![Decoding output](/Screenshots/Decode%20output.png)
+![Original image before encoding](/Screenshots/Source%20image.png)
+![Image with data encoded in it](/Screenshots/Image%20with%20Encoded%20data.png)
 
 ---
 

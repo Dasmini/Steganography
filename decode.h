@@ -30,7 +30,9 @@ typedef struct _DecodeInfo
 Status read_and_validate_decode_args(char *argv[], DecodeInfo *decInfo);
 
 /* Open files*/
-Status open_decode_files(DecodeInfo *decInfo);
+Status open_decode_file(DecodeInfo *decInfo);
+
+Status open_output_file(DecodeInfo *decInfo);
 
 /*Do Decoding*/
 Status do_decoding(DecodeInfo *decInfo);

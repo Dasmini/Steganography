@@ -119,6 +119,101 @@ Status read_and_validate_encode_args(char **argv, EncodeInfo *encInfo)
     return e_success;
 }
 
+//2 + 4 + 4 + 4 are the bytes required to store the encode contents
+Status check_capacity(EncodeInfo *encInfo)
+{
+    encInfo -> image_capacity = get_image_size_for_bmp(encInfo -> fptr_src_image);
+    encInfo -> size_secret_file = get_file_size(encInfo -> fptr_secret);    
+    if(encInfo -> image_capacity > (2 + 4 + 4 + 4 + encInfo -> size_secret_file) * 8)      
+    {
+        return e_success;
+    }
+    else
+    {
+        return e_failure;
+    }
+}
+
+Status copy_bmp_header(FILE *fptr_src_image, FILE *fptr_dest_image)
+{
+    fseek(fptr_src_image, 0, SEEK_SET);
+    char str[54];
+    fread(str, 54, 1, fptr_src_image);
+    fwrite(str, 54, 1, fptr_dest_image);
+    return e_success;
+}
+
+Status encode_magic_string(char *magic_string, EncodeInfo *encInfo)
+{
+    encode_data_to_image(magic_string, 2, encInfo);
+    return e_success;
+}
+
+Status encode_data_to_image(char *data, int size, EncodeInfo *encInfo)
+{
+    for (int i = 0; i < size; i++)
+    {
+        fread(encInfo -> image_data, 8, 1, encInfo -> fptr_src_image);
+        encode_byte_to_lsb(data[i], encInfo -> image_data);
+        fwrite(encInfo -> image_data, 8, 1, encInfo -> fptr_stego_image);
+    }
+}
+
+Status encode_byte_to_lsb(char data, char *image_buffer)
+{
+    for (int i = 0; i < 8; i++)
+    {
+        image_buffer[i] = (image_buffer[i] & 0xFE) | ((data >> (7 - i)) & 1);
+    }
+}
+
+Status encode_extension_size(int size, EncodeInfo *encInfo)
+{
+    encode_integer_to_lsb(size, encInfo);
+    return e_success;
+}
+
+Status encode_integer_to_lsb(int size, EncodeInfo *encInfo)
+{
+    char str[32];
+    fread(str, 32, 1, encInfo -> fptr_src_image);
+    for (int i = 0 ; i < 32; i++)
+    {
+        str[i] = (str[i] & 0xFE) | ((size >> (31 - i)) & 1);
+    }
+    fwrite(str, 32, 1, encInfo -> fptr_stego_image);
+}
+
+Status encode_secret_file_extn(char *file_extn, EncodeInfo *encInfo)
+{
+    encode_data_to_image(file_extn, 4, encInfo);
+    return e_success;
+}
+
+Status encode_secret_file_size(long file_size, EncodeInfo *encInfo)
+{
+    encode_integer_to_lsb(file_size, encInfo);
+    return e_success;
+}
+
+Status encode_secret_file_data(EncodeInfo *encInfo)
+{
+    char str[encInfo -> size_secret_file];
+    fseek(encInfo -> fptr_secret, SEEK_SET, 0);
+    fread(str, encInfo -> size_secret_file, 1, encInfo -> fptr_secret);
+    encode_data_to_image(str, encInfo -> size_secret_file, encInfo);
+    return e_success;
+}
+
+Status copy_remaining_img_data(FILE *fptr_src, FILE *fptr_dest)
+{
+    char ch;
+    while(fread(&ch, 1, 1, fptr_src) == 1){
+        fwrite(&ch, 1, 1, fptr_dest);
+    }
+    return e_success;
+}
+
 Status do_encoding(EncodeInfo *encInfo)
 {
     printf("Lets open the file in required mode\n");
@@ -215,103 +310,8 @@ Status do_encoding(EncodeInfo *encInfo)
     }
     else
     {
-        printf("Failed to copy remaining datat to destination\n");
+        printf("Failed to copy remaining data to destination\n");
         return e_failure;
-    }
-    return e_success;
-}
-
-//2 + 4 + 4 + 4 are the bytes required to store the encode contents
-Status check_capacity(EncodeInfo *encInfo)
-{
-    encInfo -> image_capacity = get_image_size_for_bmp(encInfo -> fptr_src_image);
-    encInfo -> size_secret_file = get_file_size(encInfo -> fptr_secret);    
-    if(encInfo -> image_capacity > (2 + 4 + 4 + 4 + encInfo -> size_secret_file) * 8)      
-    {
-        return e_success;
-    }
-    else
-    {
-        return e_failure;
-    }
-}
-
-Status copy_bmp_header(FILE *fptr_src_image, FILE *fptr_dest_image)
-{
-    fseek(fptr_src_image, 0, SEEK_SET);
-    char str[54];
-    fread(str, 54, 1, fptr_src_image);
-    fwrite(str, 54, 1, fptr_dest_image);
-    return e_success;
-}
-
-Status encode_magic_string(char *magic_string, EncodeInfo *encInfo)
-{
-    encode_data_to_image(magic_string, 2, encInfo);
-    return e_success;
-}
-
-Status encode_data_to_image(char *data, int size, EncodeInfo *encInfo)
-{
-    for (int i = 0; i < size; i++)
-    {
-        fread(encInfo -> image_data, 8, 1, encInfo -> fptr_src_image);
-        encode_byte_to_lsb(data[i], encInfo -> image_data);
-        fwrite(encInfo -> image_data, 8, 1, encInfo -> fptr_stego_image);
-    }
-}
-
-Status encode_byte_to_lsb(char data, char *image_buffer)
-{
-    for (int i = 0; i < 8; i++)
-    {
-        image_buffer[i] = (image_buffer[i] & 0xFE) | ((data >> (7 - i)) & 1);
-    }
-}
-
-Status encode_extension_size(int size, EncodeInfo *encInfo)
-{
-    encode_integer_to_lsb(size, encInfo);
-    return e_success;
-}
-
-Status encode_integer_to_lsb(int size, EncodeInfo *encInfo)
-{
-    char str[32];
-    fread(str, 32, 1, encInfo -> fptr_src_image);
-    for (int i = 0 ; i < 32; i++)
-    {
-        str[i] = (str[i] & 0xFE) | ((size >> (31 - i)) & 1);
-    }
-    fwrite(str, 32, 1, encInfo -> fptr_stego_image);
-}
-
-Status encode_secret_file_extn(char *file_extn, EncodeInfo *encInfo)
-{
-    encode_data_to_image(file_extn, 4, encInfo);
-    return e_success;
-}
-
-Status encode_secret_file_size(long file_size, EncodeInfo *encInfo)
-{
-    encode_integer_to_lsb(file_size, encInfo);
-    return e_success;
-}
-
-Status encode_secret_file_data(EncodeInfo *encInfo)
-{
-    char str[encInfo -> size_secret_file];
-    fseek(encInfo -> fptr_secret, SEEK_SET, 0);
-    fread(str, encInfo -> size_secret_file, 1, encInfo -> fptr_secret);
-    encode_data_to_image(str, encInfo -> size_secret_file, encInfo);
-    return e_success;
-}
-
-Status copy_remaining_img_data(FILE *fptr_src, FILE *fptr_dest)
-{
-    char ch;
-    while(fread(&ch, 1, 1, fptr_src) == 1){
-        fwrite(&ch, 1, 1, fptr_dest);
     }
     return e_success;
 }

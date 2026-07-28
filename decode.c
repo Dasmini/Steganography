@@ -23,13 +23,14 @@ Status read_and_validate_decode_args(char *argv[], DecodeInfo *decInfo)
     }
     else
     {
-        printf("Output file not provided, so creating 'output.txt'\n");
-        decInfo -> output_fname = "output.txt";
+        decInfo -> output_fname = NULL;
+        printf("Output file not provided, will be created during decoding!'\n");
+        
     }
     return e_success;
 }
 
-Status open_decode_files(DecodeInfo *decInfo)
+Status open_decode_file(DecodeInfo *decInfo)
 {
     decInfo -> fptr_stego_image = fopen(decInfo -> stego_image_fname, "r");
     if(decInfo -> fptr_stego_image == NULL)
@@ -38,6 +39,19 @@ Status open_decode_files(DecodeInfo *decInfo)
         fprintf(stderr, "ERROR : Unable to open file %s\n", decInfo -> stego_image_fname);
         return e_failure;
     }
+    
+    return e_success;
+}
+
+Status open_output_file(DecodeInfo *decInfo)
+{
+    if(decInfo -> output_fname == NULL)
+    {
+        char output_name[30] = "output";
+        strcat(output_name, decInfo -> extn_output);
+        decInfo -> output_fname = output_name;
+    }
+
     decInfo -> fptr_output = fopen(decInfo -> output_fname, "w");
     if(decInfo -> fptr_output == NULL)
     {
@@ -47,6 +61,7 @@ Status open_decode_files(DecodeInfo *decInfo)
     }
     return e_success;
 }
+
 Status check_magic_string(char *magic_string, DecodeInfo *decInfo)
 {
     if(fseek(decInfo -> fptr_stego_image, 54, SEEK_SET) == 0)
@@ -124,6 +139,12 @@ Status decode_output_file_size(DecodeInfo *decInfo)
 
 Status decode_output_data(DecodeInfo *decInfo)
 {
+    if(open_output_file(decInfo) == e_failure)
+    {
+        printf("Output file creating and opening failed!\n");
+        return e_failure;
+    }
+
     for (int i = 0; i < decInfo -> size_output_file; i++)
     {
         fread(decInfo -> image_data, 8, 1, decInfo -> fptr_stego_image);
@@ -147,7 +168,7 @@ Status close_decode_files(FILE *fptr_stego, FILE *fptr_output_file)
 
 Status do_decoding(DecodeInfo *decInfo)
 {
-    if(open_decode_files(decInfo) == e_success)
+    if(open_decode_file(decInfo) == e_success)
     {
         printf("Files opened successfully!\n");
     }
