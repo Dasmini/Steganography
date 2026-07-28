@@ -36,6 +36,11 @@ This project encodes a text file into a BMP image by modifying the Least Signifi
 
 ```
 .
+├── Screenshots/
+|       ├── Decode output.png
+|       ├── Encode output.png
+|       ├── Image with encoded data.png
+|       └── Source image.png
 ├── encode.c
 ├── encode.h
 ├── decode.c 
@@ -232,9 +237,15 @@ Create Output File
 ## 📸 Sample
 
 ### Encoding output
-(/Screenshots/Encode%20output.png)
+![Encoding output](/Screenshots/Encode%20output.png)
+
+### Decoding output
 ![Decoding output](/Screenshots/Decode%20output.png)
+
+### Original image before encoding
 ![Original image before encoding](/Screenshots/Source%20image.png)
+
+### Image with data encoded in it
 ![Image with data encoded in it](/Screenshots/Image%20with%20Encoded%20data.png)
 
 ---
@@ -255,7 +266,7 @@ Through this project, I gained hands-on experience with:
 
 ## 👩‍💻 Author
 
-**Dasmini D**
+**Dasmini D ❤️**
 
 Hey check out [my GitHub](https://github.com/Dasmini) and [my LinkedIn](https://www.linkedin.com/in/dasmini-d-265b3920b/)
 
